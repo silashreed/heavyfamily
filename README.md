@@ -4,8 +4,6 @@
 
 This repository contains a subset of an experimental Autonomous DeFi Agent designed to identify and evaluate yield farming opportunities across various blockchains. The core of this release is the **asynchronous High-Performance Computing (HPC) aggregator** and the **Risk Agent**, which work together to discover, filter, and rank DeFi pools, and to vet newly discovered tokens based on on-chain data.
 
-This project is a work in progress, developed as a way to explore the capabilities of AI in the context of decentralized finance. While still in its early stages, it demonstrates the potential for autonomous agents to navigate the complexities of DeFi and potentially unlock new efficiencies in investment strategies. As we continue to develop this agent, we are reminded of the significant questions surrounding the evolving role of labor and human endeavor in a future potentially shaped by advanced AI.
-
 **Disclaimer:** This is experimental software and should be used with extreme caution. It is not intended for use with real funds without thorough testing and a deep understanding of the code. The author is not responsible for any financial losses incurred through the use of this software. This is not financial advice.
 
 ## Key Features
@@ -25,7 +23,7 @@ This project is a work in progress, developed as a way to explore the capabiliti
     *   Performs the following checks using on-chain data and external APIs:
         *   **Liquidity Check:** Verifies sufficient liquidity on reputable DEXs using the DexScreener API.
         *   **Volume Check:** Ensures sufficient 24-hour trading volume using the DexScreener API.
-        *   **Holder Distribution:** Analyzes token holder distribution using Etherscan and Covalent APIs to identify potential risks (currently a placeholder, to be fully implemented).
+        *   **Holder Distribution:** Analyzes token holder distribution using Etherscan and Covalent APIs to identify potential risks.
     *   Returns `True` if a token passes all checks, `False` otherwise.
 
 *   **Bridging Data (`bridging_data.py`):**
@@ -106,39 +104,56 @@ The following thresholds are used by the `RiskAgent` when assessing new tokens:
 
 ## Usage
 
-1.  **Run the aggregator:**
+The `example_usage.py` script demonstrates how to use the aggregator:
 
-    ```bash
-    python src/heavy/aggregator_hpc_async.py
-    ```
+```python
+import asyncio
+from heavy.aggregator_hpc_async import produce_aggregator_output_async
+from heavy.concurrency_throttler import ConcurrencyThrottler
 
-    This will generate the `aggregator_output.json` file containing the ranked list of yield farming opportunities.
+async def main():
+    # Create a ConcurrencyThrottler instance (optional, but recommended)
+    concurrency_throttler = ConcurrencyThrottler(
+        max_requests_per_minute=300,
+        max_tokens_per_minute=300,
+        rate_limit_backoff_seconds=5.0
+    )
 
-2.  **Run the risk agent:**
+    # Run the aggregator
+    result_msg = await produce_aggregator_output_async(concurrency_throttler)
+    print(result_msg)
 
-    ```bash
-    python src/heavy/agents/risk_agent.py
-    ```
+if __name__ == "__main__":
+    asyncio.run(main())
+````
 
-    This will run any risk assessment checks.
+## Contributing
 
-## Example Output
+Contributions are welcome\! If you'd like to contribute, please follow these steps:
 
-The `aggregator_output.json` file will contain a list of pool objects, each with the following fields:
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes and commit them with clear commit messages.
+4.  Write tests for your changes.
+5.  Submit a pull request.
 
-```json
-{
-    "address": "...", // Might be a relevant identifier, such as a pool id
-    "chain": "ethereum", // The blockchain where the pool is located
-    "symbol": "steth", // The symbol of the primary asset in the pool
-    "apy": 4.8, // The current APY of the pool
-    "tvl": 1000000.0, // The total value locked in the pool (in USD)
-    "volatility": 0.015, // The historical volatility of the pool's APY
-    "bridging_needed": false, // Whether bridging is required to access this pool
-    "chain_factor": 1.0, // A risk factor associated with the chain
-    "is_lsd": true, // Whether the pool involves an LSD token
-    "score": 9.5, // The calculated score based on the ranking formula
-    "extra_data": {
-      // ... (Optional additional data)
-    }
-}
+## License
+
+This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
+
+## Contact
+
+For questions or feedback, please open an issue on GitHub.
+
+```
+
+**4. `requirements.txt`**
+
+```
+
+aiohttp
+requests
+python-dotenv
+py-etherscan-api
+web3
+pydantic
