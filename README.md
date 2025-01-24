@@ -144,16 +144,3 @@ This project is licensed under the [MIT License](LICENSE) - see the LICENSE file
 ## Contact
 
 For questions or feedback, please open an issue on GitHub.
-
-```
-
-**4. `requirements.txt`**
-
-```
-
-aiohttp
-requests
-python-dotenv
-py-etherscan-api
-web3
-pydantic
